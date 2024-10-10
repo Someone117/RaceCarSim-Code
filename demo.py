@@ -2,7 +2,7 @@
 Autonomous RACECAR
 MIT License
 
-File Name: demo2.py
+File Name: demo.py
 
 Title: RACECAR program that runs on 60hz LIDAR, also dispalys debug info 
 """

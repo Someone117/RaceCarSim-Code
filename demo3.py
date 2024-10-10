@@ -88,84 +88,6 @@ def lidar_to_local(lidar_samples: np.ndarray) -> np.ndarray:
 
     return np.stack((x_local, y_local), axis=-1)
 
-# def find_sequences_numpy(array):
-#     array = np.array(array)  # Convert the input to a NumPy array
-#     rows, cols = array.shape
-
-#     # Initialize an array to hold the results: [start position, length] for each row
-#     result = []  # Default values of -1 if no sequence found
-    
-#     for row_index in range(rows):
-#         row = array[row_index]
-        
-#         # Find all the indices of 1's in the row
-#         ones_indices = np.where(row == 1)[0]
-        
-#         if len(ones_indices) < 2:
-#             # If there are fewer than 2 ones, no valid sequence exists
-#             continue
-#         else:
-#             # Iterate through pairs of ones to find valid sequences
-#             maxstart = -1
-#             maxlength = -1
-#             for i in range(len(ones_indices) - 1):
-#                 start = ones_indices[i]
-#                 end = ones_indices[i + 1]
-
-#                 if start+1 == end :
-#                     continue
-                
-#                 # Check if the segment between the two 1's contains only 0's
-#                 if np.all(row[start + 1:end] == 0):
-#                     length = end - start + 1
-#                     if(length-2 > maxlength) :
-#                         maxstart = start
-#                         maxlength = length - 2
-#                     break
-#             if(maxstart > -1 and maxlength > -1) :
-#                 if(maxlength > 5) :
-#                     result.append([maxstart + (maxlength /2), row_index, maxstart])
-
-    
-#     return result
-
-# def add_circular_buffer(array, r):
-#     # Get the dimensions of the input array
-#     rows, cols = array.shape
-
-#     # Create a copy of the array to modify
-#     output = array.copy()
-
-#     # Iterate through each element of the array
-#     for i in range(rows):
-#         for j in range(cols):
-#             if array[i, j] == 1:
-#                 # Add circular buffer of radius r around the current element
-#                 for x in range(max(0, i - r), min(rows, i + r + 1)):
-#                     for y in range(max(0, j - r), min(cols, j + r + 1)):
-#                         if (i - x) ** 2 + (j - y) ** 2 <= r ** 2:
-#                             if output[x, y] == 0:  # Set buffer to 2 only if it's currently 0
-#                                 output[x, y] = 2
-#                 # Keep the original element as 1
-#                 output[i, j] = 1
-#     return output
-
-# def add_plus_buffer(array, r):
-#     # Create a copy of the array to modify
-#     output = array.copy()
-
-#     # Find the indices of elements equal to 1
-#     indices = np.argwhere(array == 1)
-
-#     for i, j in indices:
-#         # Create the '+' shaped buffer of radius r around the current element
-#         output[max(0, i - r):min(array.shape[0], i + r + 1), j] = 2
-#         output[i, max(0, j - r):min(array.shape[1], j + r + 1)] = 2
-#         # Keep the original element as 1
-#         output[i, j] = 1
-
-#     return output
-
 def add_concentric_plus_buffers(array, r1, r2):
     # Create a copy of the array to modify
     output = array.copy()
@@ -231,15 +153,13 @@ def update():
         occupancy_grid[x_coords, y_coords] = 1
 
         # create a buffer around the walls to not drive into them
+
+        if(occupancy_grid[1,99] == 2):
+            occupancy_grid[0,99] = 2
+
         buffer_size = 1
         buffer_size_2 = 5
-        buffer_size_final = buffer_size_2
-        for buff in range(1, buffer_size_2 + buffer_size, 2):
-            if(occupancy_grid[0,99 + buff] == 1 or occupancy_grid[0,99 - buff] == 1) :
-                buffer_size_final = buff
-                break
-
-        buffered = add_concentric_plus_buffers(occupancy_grid, buffer_size, buffer_size_final)    
+        buffered = add_concentric_plus_buffers(occupancy_grid, buffer_size, buffer_size_2)    
 
         start = (0,99)
         end = (199, 99)
