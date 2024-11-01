@@ -1,10 +1,12 @@
 """
 Autonomous RACECAR
-MIT License
 
 File Name: demo.py
 
-Title: RACECAR program that runs on 60hz LIDAR, also dispalys debug info 
+Title: RACECAR program that runs on 60hz LIDAR, also dispalys debug info
+
+This version is not well optimized
+
 """
 
 ########################################################################################
@@ -16,7 +18,7 @@ import sys
 sys.path.insert(0, '../library')
 import racecar_core
 import numpy as np
-from astar2 import astar2
+from astarAlg import astar
 import math
 import time
 from matplotlib import colors
@@ -80,13 +82,13 @@ def lidar_to_local(robot_x: float, robot_y: float, robot_theta: float, lidar_sam
     # Convert each LIDAR sample from polar (distance, angle) to Cartesian coordinates (x_local, y_local)
     x_local = -lidar_samples * np.cos(lidar_angles)
     y_local = lidar_samples * np.sin(lidar_angles)
-
     # Filter valid indices within bounds
     valid_mask = (lidar_samples > 5)
 
     # Apply mask to get valid points
     x_local = x_local[valid_mask]
     y_local = y_local[valid_mask]
+
 
     # # Apply the robot's rotation and position to convert to global coordinates
     # global_x = robot_x + x_local * np.cos(robot_theta) - y_local * np.sin(robot_theta)
@@ -229,6 +231,7 @@ def update():
     velocity[1] = velocity[1] + acc_global[1]*rc.get_delta_time()
     position[0] = position[0] + velocity[0]*rc.get_delta_time()
     position[1] = position[1] + velocity[1]*rc.get_delta_time()
+
     
     # plt.scatter(samples[:, 1],samples[:, 0], c='r', label="Walls")
     # plt.scatter(*position, c='g', label="Start")
@@ -282,7 +285,7 @@ def update():
 
     path = np.array(astar(buffered, start, end))
     # path = np.array(astar2(start, end, buffered))
-    print(time.time() - start_t)
+    # print(time.time() - start_t)
 
     # working above
 
@@ -291,9 +294,9 @@ def update():
         buffered[p[0]][p[1]] = 3
 
 
-    im.set_array(buffered)
-    plt.draw()
-    plt.pause(0.01)
+    # im.set_array(buffered)
+    # plt.draw()
+    # plt.pause(0.01)
 
 
     car_size = 15
@@ -336,13 +339,18 @@ def update():
     # # Combine angles using a weighted average
     # combined_angle = np.sum(angles_filtered * weights_normalized)
 
-    drive = 0.3
+    drive = 0.25
     # drive = 0
     multiplier = -4
     # print(angle)
     angle = max(min(angle*multiplier, 1), -1) # clamp to -1, 1 and invert angle and amplify angle
     # speed = 0.1 * (2.1-(abs(angle)*2))
     rc.drive.set_speed_angle(drive, angle)
+
+    # print(rc.physics.get_linear_acceleration()[0], rc.physics.get_linear_acceleration()[1], rc.physics.get_angular_velocity()[1], rc.get_delta_time(), angle)
+
+
+
     # print(walls)
 
     # plt.scatter(samples[:, 1],samples[:, 0], c='r', label="Walls")

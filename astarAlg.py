@@ -80,7 +80,7 @@ def astar(maze, start, end, allow_diagonal_movement = False):
         if outer_iterations > max_iterations:
           # if we hit this point return the path such as it is
           # it will not contain the destination
-          print("giving up on pathfinding too many iterations")
+        #   print("giving up on pathfinding too many iterations")
           return return_path(current_node)       
         
         # Get the current node
@@ -142,5 +142,5 @@ def astar(maze, start, end, allow_diagonal_movement = False):
             # Add the child to the open list
             heapq.heappush(open_list, child)
 
-    print("Couldn't get a path to destination")
+    # print("Couldn't get a path to destination")
     return []

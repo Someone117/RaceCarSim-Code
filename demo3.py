@@ -1,10 +1,11 @@
 """
 Autonomous RACECAR
-MIT License
 
-File Name: demo2.py
+File Name: demo3.py
 
 Title: RACECAR program that runs on 10hz LIDAR
+
+This version does not change buffer sizes
 
 """
 
@@ -190,6 +191,7 @@ def update():
     multiplier = -4
     angle = max(min(angle*multiplier, 1), -1) # clamp to -1, 1 and invert angle and amplify angle
     rc.drive.set_speed_angle(drive, angle)
+
 
 # [FUNCTION] update_slow() is similar to update() but is called once per second by
 # default. It is especially useful for printing debug messages, since printing a 
